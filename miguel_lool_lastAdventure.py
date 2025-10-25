@@ -2,8 +2,6 @@
 ### Desarrollado por Miguel Lool ###
 ### Ingeniería en Sistemas ###
 
-
-
 import sys
 import os
 import time
@@ -23,12 +21,20 @@ class Player:
     def __init__(self):
         self.name = ''
         self.hp = 0
-        self.mp = 0
         self.clase = ''
         self.inventory = []
         self.gold = 0
-        self.lvl = 1
         self.historia = []
+
+def reset(self):
+        ### Reinicia el jugador, para el game over
+        self.name = ''
+        self.hp = 0
+        self.clase = ''
+        self.inventory = []
+        self.gold = 0
+        self.historia = []
+
     
 player1 = Player()
 
@@ -38,8 +44,8 @@ def limpiar_pantalla():
 def generar_narrativa(tipo_evento, contexto={}):
     system_prompt = f"""Eres el narrador de un RPG de aventuras llamado 'The Last Adventure'. 
 Tu trabajo es crear narrativa inmersiva y emocionante, oscura y sin censura, que cada accion sea cruel, que represente la crueldad de este mundo oscuro y aterrador.
-El jugador se llama {player1.name}, es un {player1.clase} de nivel {player1.lvl}.
-HP actual: {player1.hp}, MP actual: {player1.mp}, Oro: {player1.gold}
+El jugador se llama {player1.name}, es un {player1.clase}.
+HP actual: {player1.hp}, Oro: {player1.gold}
 
 IMPORTANTE: Mantén las respuestas cortas (2-4 oraciones) y descriptivas.
 NO uses markdown ni formato especial, solo texto plano.
@@ -114,16 +120,16 @@ def mostrar_narrativa(texto, color = Fore.LIGHTYELLOW_EX, velocidad=0.03):
 def combate():
     opciones_combate = ["Atacar", "Usar Pocion", "Huir"]
     enemigos = [
-        {"nombre": "Goblin Putrefacto", "hp": 30, "atk": 5},
-        {"nombre": "Esqueleto Sediento", "hp": 40, "atk": 7},
-        {"nombre": "Orco Maldito", "hp": 50, "atk": 10},
-        {"nombre": "Troll Hambriento", "hp": 60, "atk": 12},
-        {"nombre": "Dragón Anciano", "hp": 100, "atk": 20},
-        {"nombre": "Lobo Aullador", "hp": 35, "atk": 6},
-        {"nombre": "Muerto Viviente", "hp": 45, "atk": 8},
-        {"nombre": "Vampiro Acechador", "hp": 55, "atk": 11},
-        {"nombre": "Hombre Lobo", "hp": 65, "atk": 13},
-        {"nombre": "Demonio Anciano", "hp": 80, "atk": 15},
+        {"nombre": "Goblin Putrefacto", "hp": 30, "atk": 15},
+        {"nombre": "Esqueleto Carcomido", "hp": 40, "atk": 17},
+        {"nombre": "Orco Sanguinario", "hp": 50, "atk": 20},
+        {"nombre": "Troll Desollador", "hp": 60, "atk": 32},
+        {"nombre": "Dragón Cadavérico", "hp": 100, "atk": 50},
+        {"nombre": "Lobo Rabioso", "hp": 35, "atk": 10},
+        {"nombre": "Muerto Viviente", "hp": 45, "atk": 18},
+        {"nombre": "Vampiro Sediento", "hp": 55, "atk": 21},
+        {"nombre": "Hombre Lobo Salvaje", "hp": 65, "atk": 23},
+        {"nombre": "Demonio Abismal", "hp": 80, "atk": 15},
     ]
     enemigo = random.choice(enemigos)
     enemigo_hp = enemigo["hp"]
@@ -136,7 +142,7 @@ def combate():
 
     while enemigo_hp > 0 and player1.hp > 0:
         limpiar_pantalla()
-        print(Fore.GREEN + f"{player1.name} - HP: {player1.hp} | MP: {player1.mp}".center(screen_width))
+        print(Fore.GREEN + f"{player1.name} - HP: {player1.hp}".center(screen_width))
         print(Fore.RED + f"{enemigo['nombre']} - HP: {enemigo_hp}".center(screen_width))
         print("\n")
         
@@ -154,7 +160,7 @@ def combate():
         elif tecla == b'\r':
             # Empieza las acciones del combate
             if opciones_combate[seleccion] == "Atacar":
-                dano = random.randint(10, 20)
+                dano = random.randint(0, 20)
                 enemigo_hp -= dano
                 print(Fore.YELLOW + f"\nHas atacado al {enemigo['nombre']} causando {dano} de daño.".center(screen_width))
             elif opciones_combate[seleccion] == "Usar Pocion":
@@ -198,12 +204,7 @@ def combate():
         player1.gold += oro_ganado
         print(Fore.YELLOW + f"Obtuviste {oro_ganado} de oro!".center(screen_width))
     else:
-        # Narrativa de derrota con la api
-        narrativa_derrota = generar_narrativa('derrota', {'enemigo': enemigo['nombre']})
-        mostrar_narrativa(narrativa_derrota, Fore.RED)
-        print(Fore.RED + "GAME OVER".center(screen_width))
-        time.sleep(3)
-        sys.exit()
+        game_over(enemigo)
     
     input("\nPresiona Enter para continuar...")
 
@@ -230,7 +231,7 @@ def explorar():
     elif evento == 'tesoro':
         oro = random.randint(20, 100)
         player1.gold += oro
-        print(Fore.YELLOW + f"¡Encontraste un cofre con {oro} de oro!".center(screen_width))
+        print(Fore.YELLOW + f"¡Encontraste un cofre ensangrentado con {oro} de oro!".center(screen_width))
         time.sleep(2)
     elif evento == 'encuentro_especial':
         narrativa_especial = generar_narrativa('encuentro_especial', 
@@ -251,9 +252,7 @@ def tienda():
     mostrar_narrativa(narrativa_tienda, Fore.YELLOW)
     
     items_tienda = [
-        {"nombre": "Poción de Vida", "precio": 30},
-        {"nombre": "Poción de Maná", "precio": 40},
-        {"nombre": "Espada Mejorada", "precio": 100},
+        {"nombre": "Poción de Sangre", "precio": 30},
     ]
     
     seleccion = 0
@@ -297,7 +296,7 @@ def menu_juego():
     while True:
         limpiar_pantalla()
         print(Fore.CYAN + Style.BRIGHT + f"=== {player1.name} el {player1.clase} ===".center(screen_width))
-        print(Fore.GREEN + f"HP: {player1.hp} | MP: {player1.mp} | Nivel: {player1.lvl} | Oro: {player1.gold}".center(screen_width))
+        print(Fore.GREEN + f"HP: {player1.hp} | Oro: {player1.gold}".center(screen_width))
         print()
         
         for i, opcion in enumerate(opciones):
@@ -352,6 +351,103 @@ def descansar():
     curacion = 50
     player1.hp = min(player1.hp + curacion, 120)  # Max HP según clase
     print(Fore.GREEN + f"Recuperaste {curacion} HP".center(screen_width))
+    time.sleep(2)
+
+def game_over(enemigo):
+    screen_width = os.get_terminal_size().columns
+    limpiar_pantalla()
+    
+    # Determinar forma de muerte según el enemigo
+    formas_muerte = {
+        "Goblin Putrefacto": "devorado por las fauces inmundas",
+        "Esqueleto Carcomido": "atravesado por huesos afilados",
+        "Orco Sanguinario": "destrozado por el hacha brutal",
+        "Troll Desollador": "desgarrado por garras inmensas",
+        "Dragón Cadavérico": "calcinado por fuego negro",
+        "Lobo Rabioso": "desangrado por colmillos rabiosos",
+        "Muerto Viviente": "infectado por la podredumbre",
+        "Vampiro Sediento": "exsanguinado hasta la última gota",
+        "Hombre Lobo Salvaje": "mutilado en la oscuridad",
+        "Demonio Abismal": "consumido por las llamas infernales"
+    }
+    
+    forma_muerte = formas_muerte.get(enemigo['nombre'], "muerte brutal en combate")
+    
+    # Narrativa de derrota
+    narrativa_derrota = generar_narrativa('derrota', {
+        'enemigo': enemigo['nombre'],
+        'forma_muerte': forma_muerte
+    })
+    mostrar_narrativa(narrativa_derrota, Fore.RED)
+    
+    # Arte de Game Over
+    game_over_art = r"""
+    
+    ██████╗  █████╗ ███╗   ███╗███████╗     ██████╗ ██╗   ██╗███████╗██████╗ 
+    ██╔════╝ ██╔══██╗████╗ ████║██╔════╝    ██╔═══██╗██║   ██║██╔════╝██╔══██╗
+    ██║  ███╗███████║██╔████╔██║█████╗      ██║   ██║██║   ██║█████╗  ██████╔╝
+    ██║   ██║██╔══██║██║╚██╔╝██║██╔══╝      ██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗
+    ╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗    ╚██████╔╝ ╚████╔╝ ███████╗██║  ██║
+     ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝     ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝
+    
+    """
+    
+    for line in game_over_art.splitlines():
+        print(Fore.RED + Style.BRIGHT + line.center(screen_width))
+    
+    print()
+    print(Fore.RED + f"Has caído ante {enemigo['nombre']}".center(screen_width))
+    print(Fore.LIGHTBLACK_EX + f"Oro acumulado: {player1.gold}".center(screen_width))
+    print()
+    
+    # Menú de Game Over
+    opciones = ["Jugar de Nuevo", "Salir al Menú", "Salir del Juego"]
+    seleccion = 0
+    
+    while True:
+        for i, opcion in enumerate(opciones):
+            if i == seleccion:
+                print(Fore.YELLOW + Style.BRIGHT + f"> {opcion} <".center(screen_width))
+            else:
+                print(Fore.WHITE + f"  {opcion}  ".center(screen_width))
+        
+        print()
+        print(Fore.CYAN + "Usa W/S para navegar y Enter para seleccionar.".center(screen_width))
+        
+        tecla = msvcrt.getch()
+        if tecla == b'w' and seleccion > 0:
+            seleccion -= 1
+            limpiar_pantalla()
+            for line in game_over_art.splitlines():
+                print(Fore.RED + Style.BRIGHT + line.center(screen_width))
+            print()
+            print(Fore.RED + f"Has caído ante {enemigo['nombre']}".center(screen_width))
+            print(Fore.LIGHTBLACK_EX + f"Oro acumulado: {player1.gold}".center(screen_width))
+            print()
+        elif tecla == b's' and seleccion < len(opciones) - 1:
+            seleccion += 1
+            limpiar_pantalla()
+            for line in game_over_art.splitlines():
+                print(Fore.RED + Style.BRIGHT + line.center(screen_width))
+            print()
+            print(Fore.RED + f"Has caído ante {enemigo['nombre']}".center(screen_width))
+            print(Fore.LIGHTBLACK_EX + f" Oro acumulado: {player1.gold}".center(screen_width))
+            print()
+        elif tecla == b'\r':
+            if seleccion == 0:  # Jugar de Nuevo
+                player1.reset()
+                limpiar_pantalla()
+                iniciar_juego()
+                break
+            elif seleccion == 1:  # Salir al Menú
+                player1.reset()
+                limpiar_pantalla()
+                menu_principal()
+                break
+            elif seleccion == 2:  # Salir del Juego
+                print(Fore.WHITE + "\nLa oscuridad te consume para siempre...".center(screen_width))
+                time.sleep(2)
+                sys.exit().GREEN + f"Tus heridas cicatrizan lentamente. Recuperaste {curacion} HP.".center(screen_width)
     time.sleep(2)
 
 ### Menu Principal ###
@@ -461,14 +557,11 @@ def iniciar_juego():
 
 def asignar_stats(player):
     if player.clase == "Guerrero":
-        player.hp = 120
-        player.mp = 30
+        player.hp = 1
     elif player.clase == "Mago":
         player.hp = 70
-        player.mp = 120
     elif player.clase == "Arquero":
         player.hp = 90
-        player.mp = 60
 
 def seleccion_clase():
     clase_seleccion = [
@@ -541,7 +634,7 @@ def seleccion_clase():
             asignar_stats(player1)
             limpiar_pantalla()
             print(Fore.GREEN + f"¡Has elegido la clase {player1.clase}, {player1.name}!".center(screen_width))
-            print(Fore.GREEN + f"HP: {player1.hp} | MP: {player1.mp}".center(screen_width))
+            print(Fore.GREEN + f"HP: {player1.hp}".center(screen_width))
             time.sleep(2)
             menu_juego()
             break
